@@ -7,7 +7,7 @@ import java.util.*;
 public class CSVReader {
     private final BufferedReader reader;
     private final String delimiter;
-    private boolean hasHeader;
+    private final boolean hasHeader;
     private final List<String> columnLabels = new ArrayList<>();
     private final Map<String,Integer> columnLabelsToInt = new HashMap<>();
     private String[]current;
@@ -31,7 +31,7 @@ public class CSVReader {
     }
 
     public CSVReader(String filename) throws IOException {
-        this(filename, ",", true);
+        this(filename, ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)", true);
     }
 
     CSVReader(Reader reader, String delimiter, boolean hasHeader) throws IOException {
@@ -60,7 +60,9 @@ public class CSVReader {
             return false;
         }
 
-        this.current = line.split(delimiter);
+        this.current = new String[columnLabels.size()];
+        String[] elements = line.split(delimiter);
+        System.arraycopy(elements, 0, this.current, 0, elements.length);
         return true;
     }
 
@@ -82,7 +84,8 @@ public class CSVReader {
 
     String get(int columnIndex){
         if(columnIndex < 0 || columnIndex >= current.length){
-            throw new InvalidIndexException("Column index out of bounds");
+            throw new InvalidIndexException("Column index out of bounds\n Actual: %d\n Max_index: %d"
+                    .formatted(columnIndex,current.length));
         }
         if (isMissing(columnIndex)){
             return "";
@@ -94,6 +97,9 @@ public class CSVReader {
         Integer header_number = columnLabelsToInt.get(columnLabel);
         if (header_number == null) {
             throw new InvalidHeaderNameException("There is no header \"%s\" ".formatted(columnLabel));
+        }
+        if (isMissing(columnLabel)){
+            return "";
         }
         return get(header_number);
     }

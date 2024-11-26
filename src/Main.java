@@ -2,7 +2,7 @@ import java.io.IOException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    static void testReader() throws IOException {
         CSVReader reader = new CSVReader("admin-units.csv",",(?=([^\"]*\"[^\"]*\")*[^\"]*$)",true);
         for(int i=0; i<100; ++i){
             reader.next();
@@ -25,5 +25,16 @@ public class Main {
             }
             System.out.println();
         }
+    }
+
+    static void testAdminUnitList() throws IOException {
+        AdminUnitList adminUnitList = new AdminUnitList();
+        adminUnitList.read("admin-units.csv");
+        AdminUnitList withPattern = adminUnitList.selectByName("sucha", false);
+        withPattern.list(System.out);
+    }
+
+    public static void main(String[] args) throws IOException {
+        testAdminUnitList();
     }
 }
