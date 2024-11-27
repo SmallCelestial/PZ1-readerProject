@@ -1,12 +1,17 @@
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class AdminUnitList {
-    List<AdminUnit> units = new ArrayList<>();
+    List<AdminUnit> units;
+
+    public AdminUnitList() {
+        this(new ArrayList<>());
+    }
+
+    public AdminUnitList(List<AdminUnit> units) {
+        this.units = units;
+    }
 
     /**
      * Czyta rekordy pliku i dodaje do listy
@@ -15,10 +20,45 @@ public class AdminUnitList {
 
     public void read(String filename) throws IOException {
         CSVReader reader = new CSVReader(filename);
+        Map<Long, AdminUnit> adminUnitsById = new HashMap<>();
+        Map<AdminUnit, Long> idOfAdminUnit = new HashMap<>();
+        Map<AdminUnit, Long> idOfParentIdByReference = new HashMap<>();
+        Map<Long,List<AdminUnit>> parentIdToChildren = new HashMap<>();
+
         while (reader.next()){
             AdminUnit adminUnit = getAdminUnitFromReader(reader);
+            long parentId;
+            try{
+                parentId = reader.getLong("parent");
+            }
+            catch (NumberFormatException e){
+                parentId = 0L;
+            }
+            Long id = reader.getLong("id");
+            adminUnitsById.put(id, adminUnit);
+            idOfAdminUnit.put(adminUnit, id);
+            idOfParentIdByReference.put(adminUnit, parentId);
             units.add(adminUnit);
+
+            if (!parentIdToChildren.containsKey(parentId)){
+                parentIdToChildren.put(parentId, new ArrayList<>());
+                parentIdToChildren.get(parentId).add(adminUnit);
+            }
+            else {
+                parentIdToChildren.get(parentId).add(adminUnit);
+            }
+
         }
+
+        for (AdminUnit unit : units) {
+            var parentId = idOfParentIdByReference.get(unit);
+            var parent = adminUnitsById.get(parentId);
+            unit.setParent(parent);
+
+            unit.setChildren(parentIdToChildren.get(idOfAdminUnit.get(unit)));
+        }
+        fixMissingValues();
+
     }
 
 
@@ -102,7 +142,7 @@ public class AdminUnitList {
 
         boundingBox = getBoundingBoxFromReader(reader);
 
-        return new AdminUnit(name, adminLevel, population, area, density, boundingBox);
+        return new AdminUnit(name, area, adminLevel, population, density, boundingBox);
 
     }
 
@@ -150,6 +190,12 @@ public class AdminUnitList {
             }
         }
         return ret;
+    }
+
+    private void fixMissingValues(){
+        for(AdminUnit unit : units){
+            unit.fixMissingValues();
+        }
     }
 
 }
