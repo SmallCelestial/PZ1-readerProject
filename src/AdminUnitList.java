@@ -63,10 +63,10 @@ public class AdminUnitList {
 
 
     private BoundingBox getBoundingBoxFromReader(CSVReader reader){
-        double xmin = 0;
-        double xmax = 0;
-        double ymin = 0;
-        double ymax = 0;
+        double xmin = Double.NaN;
+        double xmax = Double.NaN;
+        double ymin = Double.NaN;
+        double ymax = Double.NaN;
 
         try{
             xmin = Collections.min(List.of(reader.getDouble("x1"), reader.getDouble("x2"),
