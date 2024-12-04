@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class AdminUnitList {
     List<AdminUnit> units;
@@ -87,6 +88,168 @@ public class AdminUnitList {
         return neighbors;
     }
 
+    /**
+     * Sortuje daną listę jednostek (in place = w miejscu)
+     * @return this
+     */
+    AdminUnitList sortInPlaceByName(){
+        class NameComparator implements Comparator<AdminUnit> {
+            @Override
+            public int compare(AdminUnit o1, AdminUnit o2) {
+                return o1.name.compareTo(o2.name);
+            }
+        }
+
+        Comparator<AdminUnit> comparator = new NameComparator();
+
+        units.sort(comparator);
+        return this;
+    }
+
+    /**
+     * Sortuje daną listę jednostek (in place = w miejscu)
+     * @return this
+     */
+    AdminUnitList sortInPlaceByArea(){
+        units.sort(new Comparator<AdminUnit>() {
+            @Override
+            public int compare(AdminUnit o1, AdminUnit o2) {
+                return Double.compare(o1.area, o2.area);
+            }
+        });
+        return this;
+    }
+
+    /**
+     * Sortuje daną listę jednostek (in place = w miejscu)
+     * @return this
+     */
+    AdminUnitList sortInPlaceByPopulation(){
+        units.sort((o1, o2) -> Integer.compare(o1.population, o2.population));
+        return this;
+    }
+
+    AdminUnitList sortInPlace(Comparator<AdminUnit> cmp){
+        units.sort(cmp);
+        return this;
+    }
+
+    AdminUnitList sort(Comparator<AdminUnit> cmp) {
+        AdminUnitList sortedUnits = new AdminUnitList(new ArrayList<>(units));
+        sortedUnits.sortInPlace(cmp);
+        return sortedUnits;
+    }
+
+    /**
+     *
+     * @param pred referencja do interfejsu Predicate
+     * @return nową listę, na której pozostawiono tylko te jednostki,
+     * dla których metoda test() zwraca true
+     */
+    AdminUnitList filter(Predicate<AdminUnit> pred){
+        List<AdminUnit> filtered = new ArrayList<>();
+        for (AdminUnit unit : units) {
+            if (pred.test(unit)) {
+                filtered.add(unit);
+            }
+        }
+        return new AdminUnitList(filtered);
+    }
+
+
+    /**
+     * Zwraca co najwyżej limit elementów spełniających pred
+     * @param pred - predykat
+     * @param limit - maksymalna liczba elementów
+     * @return nową listę
+     */
+    AdminUnitList filter(Predicate<AdminUnit> pred, int limit){
+        List<AdminUnit> filtered = new ArrayList<>();
+        int counter = 0;
+        for (AdminUnit unit : units) {
+            if (counter == limit) {
+                break;
+            }
+            if (pred.test(unit)) {
+                filtered.add(unit);
+                counter++;
+            }
+        }
+        return new AdminUnitList(filtered);
+    }
+
+    /**
+     * Zwraca co najwyżej limit elementów spełniających pred począwszy od offset
+     * Offest jest obliczany po przefiltrowaniu
+     * @param pred - predykat
+     * @param - od którego elementu
+     * @param limit - maksymalna liczba elementów
+     * @return nową listę
+     */
+    AdminUnitList filter(Predicate<AdminUnit> pred, int offset, int limit){
+        AdminUnitList result = new AdminUnitList();
+        var filtered = result.units;
+        int counter = 0;
+        for (AdminUnit unit : units) {
+            if (counter == limit) {
+                break;
+            }
+            if (pred.test(unit)) {
+                counter++;
+                if (counter > offset) {
+                    filtered.add(unit);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Wypisuje zawartość korzystając z AdminUnit.toString()
+     * @param out
+     */
+    void list(PrintStream out){
+        for (AdminUnit unit : units){
+            out.println(unit.toString());
+        }
+    }
+
+    /**
+     * Wypisuje co najwyżej limit elementów począwszy od elementu o indeksie offset
+     * @param out - strumień wyjsciowy
+     * @param offset - od którego elementu rozpocząć wypisywanie
+     * @param limit - ile (maksymalnie) elementów wypisać
+     */
+    void list(PrintStream out,int offset, int limit ){
+        for(int actualIndex = offset, printedCount = 0; printedCount < limit && actualIndex < units.size(); offset++, printedCount++){
+            out.println(units.get(actualIndex));
+        }
+    }
+
+    /**
+     * Zwraca nową listę zawierającą te obiekty AdminUnit, których nazwa pasuje do wzorca
+     * @param pattern - wzorzec dla nazwy
+     * @param regex - jeśli regex=true, użyj finkcji String matches(); jeśli false użyj funkcji contains()
+     * @return podzbiór elementów, których nazwy spełniają kryterium wyboru
+     */
+    AdminUnitList selectByName(String pattern, boolean regex){
+        AdminUnitList ret = new AdminUnitList();
+        for (AdminUnit unit : units){
+            if (regex){
+                if (unit.name.matches(pattern)){
+                    ret.units.add(unit);
+                }
+            }
+            else{
+                if (unit.name.contains(pattern)){
+                    ret.units.add(unit);
+                }
+
+            }
+        }
+        return ret;
+    }
+
 
     private BoundingBox getBoundingBoxFromReader(CSVReader reader){
         double xmin = Double.NaN;
@@ -170,52 +333,6 @@ public class AdminUnitList {
 
         return new AdminUnit(name, area, adminLevel, population, density, boundingBox);
 
-    }
-
-    /**
-     * Wypisuje zawartość korzystając z AdminUnit.toString()
-     * @param out
-     */
-    void list(PrintStream out){
-        for (AdminUnit unit : units){
-            out.println(unit.toString());
-        }
-    }
-
-    /**
-     * Wypisuje co najwyżej limit elementów począwszy od elementu o indeksie offset
-     * @param out - strumień wyjsciowy
-     * @param offset - od którego elementu rozpocząć wypisywanie
-     * @param limit - ile (maksymalnie) elementów wypisać
-     */
-    void list(PrintStream out,int offset, int limit ){
-        for(int actualIndex = offset, printedCount = 0; printedCount < limit && actualIndex < units.size(); offset++, printedCount++){
-            out.println(units.get(actualIndex));
-        }
-    }
-
-    /**
-     * Zwraca nową listę zawierającą te obiekty AdminUnit, których nazwa pasuje do wzorca
-     * @param pattern - wzorzec dla nazwy
-     * @param regex - jeśli regex=true, użyj finkcji String matches(); jeśli false użyj funkcji contains()
-     * @return podzbiór elementów, których nazwy spełniają kryterium wyboru
-     */
-    AdminUnitList selectByName(String pattern, boolean regex){
-        AdminUnitList ret = new AdminUnitList();
-        for (AdminUnit unit : units){
-            if (regex){
-                if (unit.name.matches(pattern)){
-                    ret.units.add(unit);
-                }
-            }
-            else{
-                if (unit.name.contains(pattern)){
-                    ret.units.add(unit);
-                }
-
-            }
-        }
-        return ret;
     }
 
     private void fixMissingValues(){
