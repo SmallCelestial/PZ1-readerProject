@@ -252,44 +252,15 @@ public class AdminUnitList {
 
 
     private BoundingBox getBoundingBoxFromReader(CSVReader reader){
-        double xmin = Double.NaN;
-        double xmax = Double.NaN;
-        double ymin = Double.NaN;
-        double ymax = Double.NaN;
-
+        BoundingBox boundingBox = new BoundingBox();
         try{
-            xmin = Collections.min(List.of(reader.getDouble("x1"), reader.getDouble("x2"),
-                    reader.getDouble("x3"), reader.getDouble("x4"), reader.getDouble("x5"))
-            );
-        }
-        catch (NumberFormatException ignored){
-        }
+            boundingBox.addPoint(reader.getDouble("x1"), reader.getDouble("y1"));
+            boundingBox.addPoint(reader.getDouble("x2"), reader.getDouble("y2"));
+            boundingBox.addPoint(reader.getDouble("x3"), reader.getDouble("y3"));
+            boundingBox.addPoint(reader.getDouble("x4"), reader.getDouble("y4"));
+        }catch (NumberFormatException ignored){}
 
-        try{
-            xmax = Collections.max(List.of(reader.getDouble("x1"), reader.getDouble("x2"),
-                    reader.getDouble("x3"), reader.getDouble("x4"), reader.getDouble("x5"))
-            );
-        }
-        catch (NumberFormatException ignored){
-        }
-
-        try{
-            ymin = Collections.min(List.of(reader.getDouble("y1"), reader.getDouble("y2"),
-                    reader.getDouble("y3"), reader.getDouble("y4"), reader.getDouble("y5"))
-            );
-        }
-        catch (NumberFormatException ignored){
-        }
-
-        try{
-            ymax = Collections.max(List.of(reader.getDouble("y1"), reader.getDouble("y2"),
-                    reader.getDouble("y3"), reader.getDouble("y4"), reader.getDouble("y5"))
-            );
-        }
-        catch (NumberFormatException ignored){
-        }
-
-        return new BoundingBox(xmin, ymin, xmax, ymax);
+        return boundingBox;
     }
 
     private AdminUnit getAdminUnitFromReader(CSVReader reader){

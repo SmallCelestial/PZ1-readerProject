@@ -134,26 +134,26 @@ public class Main {
 
 
     public static void main(String[] args) throws IOException {
-//        testAdminUnitList();
+        testAdminUnitList();
 //        readStartsWithKOrderByArea();
 //        districtsWithParentAsMalopolskie();
 //        exmapleWithAndOr();
-        StringBuilder line_break = new StringBuilder("\n");
-        for (int i=0; i< 30; i++){
-            line_break.append("*");
-        }
-        line_break.append("\n");
-
-        AdminUnitList list = readPlaces();
-        testQuery0(list);
-
-        System.out.println(line_break);
-        testQuery1(list);
-
-        System.out.println(line_break);
-        testQuery2(list);
-
-        System.out.println(line_break);
-        testQuery3(list);
+//        StringBuilder line_break = new StringBuilder("\n");
+//        for (int i=0; i< 30; i++){
+//            line_break.append("*");
+//        }
+//        line_break.append("\n");
+//
+//        AdminUnitList list = readPlaces();
+//        testQuery0(list);
+//
+//        System.out.println(line_break);
+//        testQuery1(list);
+//
+//        System.out.println(line_break);
+//        testQuery2(list);
+//
+//        System.out.println(line_break);
+//        testQuery3(list);
     }
 }
