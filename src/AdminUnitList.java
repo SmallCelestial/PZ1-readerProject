@@ -74,7 +74,7 @@ public class AdminUnitList {
         AdminUnitList neighbors = new AdminUnitList();
         int adminLevel = unit.adminLevel;
         for (AdminUnit adminUnit : units) {
-            if (adminUnit.adminLevel != adminLevel || !unit.bbox.intersects(adminUnit.bbox)){
+            if (adminUnit.adminLevel != adminLevel || !unit.bbox.intersects(adminUnit.bbox) || adminUnit.equals(unit)){
                 continue;
             }
             if (adminLevel != 8){
@@ -83,6 +83,40 @@ public class AdminUnitList {
 
             else if (unit.bbox.distanceTo(adminUnit.bbox) <= maxdistance){
                 neighbors.units.add(adminUnit);
+            }
+        }
+        return neighbors;
+    }
+
+    AdminUnitList getNeighborsHierarchical(AdminUnit unit, double maxdistance){
+        AdminUnitList neighbors = new AdminUnitList();
+        if (unit.parent == null) {
+            return getNeighbors(unit, maxdistance);
+        }
+
+        for (AdminUnit sibling : unit.parent.children) {
+            if (sibling != unit && sibling.adminLevel == unit.adminLevel) {
+                if (unit.adminLevel == 8) {
+                    if (unit.bbox.distanceTo(sibling.bbox) <= maxdistance) {
+                        neighbors.units.add(sibling);
+                    }
+                } else {
+                    if (unit.bbox.intersects(sibling.bbox)) {
+                        neighbors.units.add(sibling);
+                    }
+                }
+            }
+        }
+
+        if (unit.parent.parent != null) {
+            for (AdminUnit uncle : unit.parent.parent.children) {
+                if (uncle != unit.parent && uncle.children != null) {
+                    for (AdminUnit cousin : uncle.children) {
+                        if (cousin.adminLevel == unit.adminLevel && unit.bbox.intersects(cousin.bbox)) {
+                            neighbors.units.add(cousin);
+                        }
+                    }
+                }
             }
         }
         return neighbors;

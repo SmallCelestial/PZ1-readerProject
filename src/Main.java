@@ -38,25 +38,8 @@ public class Main {
 
     static void testAdminUnitList() throws IOException {
         AdminUnitList adminUnitList = readPlaces();
-        AdminUnit place = null;
-//        AdminUnitList withPattern = adminUnitList.selectByName("sucha", false);
-//        withPattern.list(System.out);
-        for(AdminUnit unit: adminUnitList.units){
-            if (unit.name.equals("Kraków")){
-                place = unit;
-                break;
-            }
-        }
-        System.out.println(place);
-
-        double t1 = System.nanoTime()/1e6;
-        AdminUnitList neighboursOfPlace = adminUnitList.getNeighbors(place, 15);
-        double t2 = System.nanoTime()/1e6;
-        System.out.printf(Locale.US,"t2-t1=%f\n",t2-t1);
-
-        for (AdminUnit neighbour: neighboursOfPlace.units){
-            System.out.println(neighbour);
-        }
+        AdminUnitList withPattern = adminUnitList.selectByName("sucha", false);
+        withPattern.list(System.out);
 
     }
 
@@ -89,6 +72,48 @@ public class Main {
 
         var out = System.out;
         list.filter(complexCriteria).list(out);
+    }
+
+    static void testGettingNeigbours() throws IOException {
+        AdminUnitList adminUnitList = readPlaces();
+        AdminUnit place = null;
+        for(AdminUnit unit: adminUnitList.units){
+            if (unit.name.equals("Kraków")){
+                place = unit;
+                break;
+            }
+        }
+        System.out.println(place);
+
+        double t1 = System.nanoTime()/1e6;
+        AdminUnitList neighboursOfPlace = adminUnitList.getNeighbors(place, 15);
+        double t2 = System.nanoTime()/1e6;
+        System.out.printf(Locale.US,"t2-t1=%f\n",t2-t1);
+
+        for (AdminUnit neighbour: neighboursOfPlace.units){
+            System.out.println(neighbour);
+        }
+    }
+
+    static void testGettingNeigboursHierarchical() throws IOException {
+        AdminUnitList adminUnitList = readPlaces();
+        AdminUnit place = null;
+        for(AdminUnit unit: adminUnitList.units){
+            if (unit.name.equals("Kraków")){
+                place = unit;
+                break;
+            }
+        }
+        System.out.println(place);
+
+        double t1 = System.nanoTime()/1e6;
+        AdminUnitList neighboursOfPlace = adminUnitList.getNeighborsHierarchical(place, 15);
+        double t2 = System.nanoTime()/1e6;
+        System.out.printf(Locale.US,"t2-t1=%f\n",t2-t1);
+
+        for (AdminUnit neighbour: neighboursOfPlace.units){
+            System.out.println(neighbour);
+        }
     }
 
     static void testQuery0(AdminUnitList list) throws IOException {
@@ -134,15 +159,13 @@ public class Main {
 
 
     public static void main(String[] args) throws IOException {
-        testAdminUnitList();
+        StringBuilder line_break = new StringBuilder("\n");
+        line_break.append("*".repeat(30));
+        line_break.append("\n");
+//        testAdminUnitList();
 //        readStartsWithKOrderByArea();
 //        districtsWithParentAsMalopolskie();
 //        exmapleWithAndOr();
-//        StringBuilder line_break = new StringBuilder("\n");
-//        for (int i=0; i< 30; i++){
-//            line_break.append("*");
-//        }
-//        line_break.append("\n");
 //
 //        AdminUnitList list = readPlaces();
 //        testQuery0(list);
@@ -155,5 +178,9 @@ public class Main {
 //
 //        System.out.println(line_break);
 //        testQuery3(list);
+
+        testGettingNeigbours();
+        System.out.println(line_break);
+        testGettingNeigboursHierarchical();
     }
 }
