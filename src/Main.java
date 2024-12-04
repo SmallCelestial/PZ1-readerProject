@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Locale;
 
 public class Main {
 
@@ -30,8 +31,26 @@ public class Main {
     static void testAdminUnitList() throws IOException {
         AdminUnitList adminUnitList = new AdminUnitList();
         adminUnitList.read("admin-units.csv");
-        AdminUnitList withPattern = adminUnitList.selectByName("sucha", false);
-        withPattern.list(System.out);
+        AdminUnit place = null;
+//        AdminUnitList withPattern = adminUnitList.selectByName("sucha", false);
+//        withPattern.list(System.out);
+        for(AdminUnit unit: adminUnitList.units){
+            if (unit.name.equals("Kraków")){
+                place = unit;
+                break;
+            }
+        }
+        System.out.println(place);
+
+        double t1 = System.nanoTime()/1e6;
+        AdminUnitList neighboursOfPlace = adminUnitList.getNeighbors(place, 15);
+        double t2 = System.nanoTime()/1e6;
+        System.out.printf(Locale.US,"t2-t1=%f\n",t2-t1);
+
+        for (AdminUnit neighbour: neighboursOfPlace.units){
+            System.out.println(neighbour);
+        }
+
     }
 
     public static void main(String[] args) throws IOException {

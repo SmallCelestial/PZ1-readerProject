@@ -25,6 +25,10 @@ public class BoundingBox {
         return ymax;
     }
 
+    public BoundingBox(){
+        this(Double.NaN, Double.NaN, Double.NaN, Double.NaN);
+    }
+
     public BoundingBox(double xmin, double ymin, double xmax, double ymax) {
         this.xmin = xmin;
         this.ymin = ymin;
@@ -202,5 +206,15 @@ public class BoundingBox {
         this.ymin = ymin;
         this.xmax = xmax;
         this.ymax = ymax;
+    }
+
+    @Override
+    public String toString() {
+        return "BoundingBox{" +
+                "xmin=" + xmin +
+                ", ymin=" + ymin +
+                ", xmax=" + xmax +
+                ", ymax=" + ymax +
+                '}';
     }
 }

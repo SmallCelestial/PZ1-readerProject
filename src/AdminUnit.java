@@ -6,19 +6,16 @@ public class AdminUnit {
     int population;
     double area;
     double density;
+    List<AdminUnit> children;
+    AdminUnit parent;
+    BoundingBox bbox;
 
     public void setChildren(List<AdminUnit> children) {
         this.children = children;
     }
-
-    List<AdminUnit> children;
-
     public void setParent(AdminUnit parent) {
         this.parent = parent;
     }
-
-    AdminUnit parent;
-    BoundingBox bbox;
 
     public AdminUnit() {
     }
@@ -45,6 +42,7 @@ public class AdminUnit {
                 ", population=" + population +
                 ", area=" + area +
                 ", density=" + density +
+                ", bbox=" + bbox +
                 '}';
     }
 
